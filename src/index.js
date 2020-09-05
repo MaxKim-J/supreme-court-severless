@@ -2,6 +2,13 @@ const functions = require('firebase-functions');
 const puppeteer = require('puppeteer');
 const admin = require('firebase-admin');
 const axios = require('axios');
+const dotenv = require('dotenv')
+const precedentTypeFilter = require('./utils/precedentTypeFilter')
+
+const LOCALHOST = "http://localhost:3000/precedent"
+const PRODSERVER = "https://law-bot.me/precedent"
+
+dotenv.config()
 
 admin.initializeApp({
   credential: admin.credential.applicationDefault(),
@@ -13,9 +20,14 @@ const runtimeOpts = {
   memory: '256MB'
 }
 
-exports.precedentCrawler = functions.runWith(runtimeOpts).https.onRequest(async(req, res) => {
+const supremeCourtApi = axios.create({
+  baseURL:LOCALHOST,
+  headers:{'Authorization': process.env.API_KEY}
+})
+
+exports.initialCrawler = functions.runWith(runtimeOpts).https.onRequest(async(req, res) => {
   const lastPrecedentLength = await admin.database().ref('/precedent/counts').once('value')
-  console.log(`**** 마지막으로 크롤링된 판례 수 : ${lastPrecedentLength.val()}개 ****`)
+  console.log(`**** 마지막으로 크롤링했을 때 사이트 판례 수 : ${lastPrecedentLength.val()}개 ****`)
 
   console.log('1.크롤링 시작')
   console.log('2.초기 페이지 세팅')
@@ -54,6 +66,10 @@ exports.precedentCrawler = functions.runWith(runtimeOpts).https.onRequest(async(
         const titleElem = await section.$('td:nth-child(2)>dl>dt>a>strong>strong')
         const title = await titleElem.evaluate(elem => elem.innerText)
 
+        const precedentType = title.split(' ')[5].slice(4,5)
+        console.log(precedentType)
+        const type = precedentTypeFilter(precedentType)
+
         const urlElem = await section.$('td:nth-child(2)>dl>dt>a:nth-child(2)')
         const url = await urlElem.evaluate(elem => elem.id.split('_')[1])
 
@@ -65,7 +81,7 @@ exports.precedentCrawler = functions.runWith(runtimeOpts).https.onRequest(async(
 
         const contentElem = await section.$('td:nth-child(2)>dl>dd:nth-child(2)>dl>dd')
         const content = await contentElem.evaluate(elem =>elem.innerHTML)
-        return { id:(current-1)*80+id, title, url, content }
+        return { id:(current-1)*80+id, title, type, url, content }
       } catch(e) {
         return null
       }
@@ -106,11 +122,17 @@ exports.precedentCrawler = functions.runWith(runtimeOpts).https.onRequest(async(
     .ref("/precedent")
     .set({ counts: parseInt(sitePrecedentLength, 10) });
 
-  const newlyUpdatePrecedentLength = sitePrecedentLength - lastPrecedentLength
+  const newlyUpdatePrecedentLength = parseInt(sitePrecedentLength,10) - parseInt(lastPrecedentLength,10)
   console.log(`6. 새로운 ${newlyUpdatePrecedentLength}개의 판례를 supreme-court-api를 통해 판례 데이터베이스에 저장합니다.`)
 
   res.status(200).send(finalResult);
 });
+
+exports.watchCrawler = functions.runWith(runtimeOpts).https.onRequest(async(req,res) => {
+  const lastPrecedentLength = await admin.database().ref('/precedent/counts').once('value')
+
+  console.log(`**** 마지막으로 크롤링된 판례 수 : ${lastPrecedentLength.val()}개 ****`)
+})
 
 exports.tweetBot = functions.https.onRequest((req, res) => {
   console.log('트윗봇')
