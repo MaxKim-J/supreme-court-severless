@@ -2,7 +2,6 @@ const supremeCourtApi = require('../services')
 const configs = require('../configs')
 const lengthFilter = require('../utils/lengthFilter')
 const precedentTypeFilter = require('../utils/precedentTypeFilter')
-const admin = require('firebase-admin')
 
 class PrecedentCrawler {
   constructor(browser, page) {

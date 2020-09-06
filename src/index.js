@@ -1,8 +1,6 @@
 const functions = require('firebase-functions')
 const puppeteer = require('puppeteer')
 const admin = require('firebase-admin')
-const precedentTypeFilter = require('./utils/precedentTypeFilter')
-const supremeCourtApi = require('./services')
 const { defaultRuntimeOpts } = require('./configs')
 const PrecedentCrawler = require('./modules/precedentCrawler')
 const Firebase = require('./modules/firebase')
@@ -28,7 +26,6 @@ exports.initialCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(a
     const pageCounts = await crawler.getTargetPageCount()
 
     console.log('크롤링을 시작합니다')
-    let sections = []
     for(let i = 1; i <= pageCounts; i++) {
       let { sections, currentPage } = await crawler.getSectionsByTargetPage()
 
