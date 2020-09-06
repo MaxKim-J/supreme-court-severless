@@ -27,6 +27,7 @@ exports.initialCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(a
 
     console.log('크롤링을 시작합니다')
     for(let i = 1; i <= pageCounts; i++) {
+      /* eslint-disable no-await-in-loop */
       let { sections, currentPage } = await crawler.getSectionsByTargetPage()
 
       console.log(`- ${currentPage} 페이지에서 발견한 판례 개수 ${sections.length}개`)
