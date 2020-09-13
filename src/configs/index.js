@@ -1,6 +1,6 @@
 const defaultRuntimeOpts = {
   timeoutSeconds: 300,
-  memory: '256MB'
+  memory: '1GB'
 }
 
 const crawlTarget = 'https://glaw.scourt.go.kr/wsjo/panre/sjo050.do'

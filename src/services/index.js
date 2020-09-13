@@ -3,7 +3,7 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
-const LOCALHOST = "http://localhost:3000/precedent"
+// const LOCALHOST = "http://localhost:3000/precedent"
 const PRODSERVER = "https://law-bot.me/precedent"
 
 const supremeCourtApi = axios.create({

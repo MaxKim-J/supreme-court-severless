@@ -55,7 +55,7 @@ class PrecedentCrawler {
         elem.querySelector('td:nth-child(2)>dl>dt>a:nth-child(2)').click()
       })
 
-      await this.page.waitFor(2000)
+      await this.page.waitFor(5000)
 
       const contentElem = await section.$('td:nth-child(2)>dl>dd:nth-child(2)>dl>dd')
       const content = await contentElem.evaluate(elem =>elem.innerHTML)
