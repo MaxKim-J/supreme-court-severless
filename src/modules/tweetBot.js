@@ -18,8 +18,12 @@ class TweetBot {
     return {id,name}
   }
 
-  async postTweet() {
-    const {id,name} = await this.getCurrentTweet()
+  async putTweetTimeStamp(id) {
+    const {data:{tweet:{uploadedAt}}} = await supremeCourtApi.put(`/tweet/${id}`)
+    return uploadedAt
+  }
+
+  postTweet(id,name) {
     this.client.post('statuses/update', {
       status:`${name}\nhttps://tweet-bot-client.vercel.app/detail/${id}`
     },(err,data,response) => {
