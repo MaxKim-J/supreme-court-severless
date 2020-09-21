@@ -73,7 +73,7 @@ class PrecedentCrawler {
   async requestPostPrecedents(precedents) {
       const { data : {counts:{
         newTweetsLength, newPrecedentsLength
-      }}} = await supremeCourtApi.post('', {
+      }}} = await supremeCourtApi.post('/precedent', {
         isTweetUpdate:true,
         precedents
       })

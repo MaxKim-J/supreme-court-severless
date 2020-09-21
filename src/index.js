@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer')
 const admin = require('firebase-admin')
 const { defaultRuntimeOpts } = require('./configs')
 const PrecedentCrawler = require('./modules/precedentCrawler')
+const TweetBot = require('./modules/tweetBot')
 const Firebase = require('./modules/firebase')
 
 const firebase = new Firebase(admin)
@@ -148,5 +149,13 @@ exports.watchCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(asy
 
 exports.tweetBot = functions.https.onRequest((req, res) => {
   console.log('트윗봇')
+  const bot = new TweetBot()
+  //todo current 요청
+  bot.getCurrentTweet()
+  //todo 트윗 작성
+  bot.postTweet()
+  //todo 트윗 업로드
+  //todo put 요청
   res.send("나는 트윗봇이다")
+
 })
