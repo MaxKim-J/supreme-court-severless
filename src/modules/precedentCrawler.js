@@ -83,7 +83,7 @@ class PrecedentCrawler {
   async movedToNextTargetPage() {
     const pagingElem = await this.page.$('p.list_location')
     try {
-      await pagingElem.evaluate(elem=> {
+      await pagingElem.evaluate(elem => {
         const nextPageBtn = elem.querySelector('a:nth-child(3)')
         nextPageBtn.click()
       })

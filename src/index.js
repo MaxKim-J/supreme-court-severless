@@ -148,22 +148,24 @@ exports.watchCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(asy
 })
 
 exports.tweetBot = functions.https.onRequest(async(req, res) => {
-  console.log('트윗봇')
+  console.log('트윗봇을 시작합니다.')
   const bot = new TweetBot()
-  //todo current 요청
   try {
+    console.log(`업로드할 트윗을 가져옵니다.`)
     const {id,name} = await bot.getCurrentTweet()
-    //todo 트윗 업로드
-    bot.postTweet(id,name)
-    //todo put 요청
+    console.log(`${id}번 ${name} 트윗을 업로드합니다.`)
     const uploadedAt = await bot.putTweetTimeStamp(id)
+    console.log(`${id}번 트윗의 타임스탬프를 표시합니다.`)
+    if(uploadedAt) { bot.postTweet(id,name) }
+    console.log(`${id}트윗을 트위터 포스팅합니다.`)
+    console.log('트윗이 성공적으로 올라갔습니다. 트윗봇을 종료합니다.')
     return await res.status(200).send({
       id,
       name,
       uploadedAt
     })
   } catch(err) {
-    console.log(`***에러가 발생했습니다. 크롤러를 종료하고 500 응답을 보냅니다.***`)
+    console.log(`***에러가 발생했습니다. 트윗봇을 종료하고 500 응답을 보냅니다.***`)
     res.status(500).send(
       {
         message : err.message,
