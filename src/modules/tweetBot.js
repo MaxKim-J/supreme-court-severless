@@ -26,7 +26,7 @@ class TweetBot {
   postTweet(id,name) {
     this.client.post('statuses/update', {
       status:`${name}\nhttps://tweet-bot-client.vercel.app/detail/${id}`
-    },(err,data,response) => {
+    },(err,data) => {
       if(err) {throw err}
       return data.text
     })
