@@ -88,7 +88,7 @@ exports.watchCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(asy
     const page = await browser.newPage()
     const crawler = new PrecedentCrawler(browser, page)
 
-    await crawler.goToCrawlTarget()
+    await crawler.goToWatchCrawlTarget()
     await crawler.setTargetPagePrecedentsLength(80)
 
     const sitePrecedentLength = await crawler.getTargetPagePrecedentLength()
@@ -104,9 +104,10 @@ exports.watchCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(asy
       const resultPromise = sections.map(section => crawler.scrapPrecedentSection(section))
       const result = await crawler.resolvePrecedentPromises(resultPromise)
 
-      console.log(`* 크롤링 완료된 판례 개수 ${result.length}개`)
+      const crawledPrecedentLength = result.length
 
-      const sitePrecedentLength = await crawler.getTargetPagePrecedentLength()
+      console.log(`* 크롤링 완료된 판례 개수 ${crawledPrecedentLength}개`)
+
       await crawler.shutCrawlerDown()
 
       console.log(`firebase 데이터베이스에 현재 사이트에 공개된 대법원 판례 개수(${sitePrecedentLength})를 기록합니다.`)
@@ -126,8 +127,14 @@ exports.watchCrawler = functions.runWith(defaultRuntimeOpts).https.onRequest(asy
             newTweets: newTweetsLength,
           }
         })
-      } catch(e) {
-        console.log(e.message)
+      } catch(err) {
+        console.log(`***DB를 업데이트 할 수 없습니다. 크롤러를 종료하고 500 응답을 보냅니다.***`)
+        res.status(500).send(
+          {
+            message : err.message,
+            error:err,
+          }
+        )
       }
     } else {
       console.log(`***세롭게 크롤링할 판례가 없습니다. 크롤러를 종료하고 200 응답을 보냅니다.***`)

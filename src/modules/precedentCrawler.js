@@ -14,6 +14,13 @@ class PrecedentCrawler {
     await this.page.waitFor(2000)
   }
 
+  async goToWatchCrawlTarget() {
+    await this.goToCrawlTarget()
+    const recentBtn = await this.page.$('.bg_1.ml__1')
+    await recentBtn.click()
+    await this.page.waitFor(3000)
+  }
+
   async setTargetPagePrecedentsLength(precedentLength) {
     const targetChildNum = lengthFilter(precedentLength)
     const supremeCourtBtn = await this.page.$('#groupList>li.last ul>li:nth-child(1) a')
